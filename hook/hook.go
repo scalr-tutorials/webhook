@@ -123,6 +123,27 @@ func CheckPayloadSignature256(payload []byte, secret string, signature string) (
 	return expectedMAC, err
 }
 
+func CheckScalrSignature(headers map[string]interface{}, body []byte, signingKey string) (bool, error) {
+	// Check for the signature and date headers
+	if _, ok := headers["X-Signature"]; !ok {
+		return false, nil
+	}
+	if _, ok := headers["Date"]; !ok {
+		return false, nil
+	}
+	providedSignature := headers["X-Signature"].(string)
+	dateHeader := headers["Date"].(string)
+	mac := hmac.New(sha1.New, []byte(signingKey))
+	mac.Write(body)
+	mac.Write([]byte(dateHeader))
+	expectedSignature := hex.EncodeToString(mac.Sum(nil))
+
+	if !hmac.Equal([]byte(providedSignature), []byte(expectedSignature)) {
+		return false, &SignatureError{providedSignature}
+	}
+	return true, nil
+}
+
 // CheckIPWhitelist makes sure the provided remote address (of the form IP:port) falls within the provided IP range
 // (in CIDR form or a single IP address).
 func CheckIPWhitelist(remoteAddr string, ipRange string) (bool, error) {
@@ -629,12 +650,17 @@ const (
 	MatchHashSHA1   string = "payload-hash-sha1"
 	MatchHashSHA256 string = "payload-hash-sha256"
 	IPWhitelist     string = "ip-whitelist"
+	ScalrSignature  string = "scalr-signature"
 )
 
 // Evaluate MatchRule will return based on the type
 func (r MatchRule) Evaluate(headers, query, payload *map[string]interface{}, body *[]byte, remoteAddr string) (bool, error) {
 	if r.Type == IPWhitelist {
 		return CheckIPWhitelist(remoteAddr, r.IPRange)
+	}
+
+	if r.Type == ScalrSignature {
+		return CheckScalrSignature(*headers, *body, r.Secret)
 	}
 
 	if arg, ok := r.Parameter.Get(headers, query, payload); ok {
