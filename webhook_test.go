@@ -14,7 +14,7 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/adnanh/webhook/hook"
+	"github.com/scalr-tutorials/webhook/hook"
 )
 
 func TestWebhook(t *testing.T) {
