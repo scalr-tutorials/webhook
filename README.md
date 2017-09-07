@@ -1,11 +1,23 @@
-[![ghit.me](https://ghit.me/badge.svg?repo=adnanh/webhook)](https://ghit.me/repo/adnanh/webhook) [![Join the chat at https://gitter.im/adnanh/webhook](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/adnanh/webhook?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![Flattr this](https://button.flattr.com/flattr-badge-large.png)](https://flattr.com/submit/auto?user_id=adnanh&url=https%3A%2F%2Fwww.github.com%2Fadnanh%2Fwebhook) [Donate via PayPal](https://paypal.me/hookdoo) | [Patreon page](https://www.patreon.com/webhook)
+# webhook
 
+This is a fork of [adnanh/webhook](https://github.com/adnanh/webhook/) that adds Scalr webhook signature verification. To verify the Scalr signature on a hook, use a match rule similar to this example:
 
-# Hookdoo
-<a href="https://www.hookdoo.com/?github"><img src="https://my.hookdoo.com/logo/logo-dark-96.png" alt="hookdoo" align="left" /></a>
- 
-If you don't have time to waste configuring, hosting, debugging and maintaining your webhook instance, we offer a __SaaS__ solution that has all of the capabilities webhook provides, plus a lot more, and all that packaged in a nice friendly web interface. If you are interested, find out more at [hookdoo website](https://www.hookdoo.com/?ref=github-webhook-readme). If you have any questions, you can contact us at info@hookdoo.com
+```
+[
+    {
+        "id": "scalr-test",
+        "execute-command": "test.sh",
+        "trigger-rule": {
+            "match": {
+                "type": "scalr-signature",
+                "secret": "Scalr-provided signing key"
+            }
+        }
+    }
+]
+```
 
+Original documentation:
 
 # What is webhook?
 [webhook](https://github.com/adnanh/webhook/) is a lightweight configurable tool written in Go, that allows you to easily create HTTP endpoints (hooks) on your server, which you can use to execute configured commands. You can also pass data from the HTTP request (such as headers, payload or query variables) to your commands. [webhook](https://github.com/adnanh/webhook/) also allows you to specify rules which have to be satisfied in order for the hook to be triggered.
