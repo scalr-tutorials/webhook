@@ -17,6 +17,11 @@ This is a fork of [adnanh/webhook](https://github.com/adnanh/webhook/) that adds
         },
         "pass-environment-to-command": [
             {
+                "envname": "EVENT_NAME",
+                "source": "payload",
+                "name": "eventName"
+            },
+            {
                 "envname": "SERVER_HOSTNAME",
                 "source": "payload",
                 "name": "data.SCALR_SERVER_HOSTNAME"
