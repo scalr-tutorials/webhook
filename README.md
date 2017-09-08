@@ -31,6 +31,8 @@ This is a fork of [adnanh/webhook](https://github.com/adnanh/webhook/) that adds
 ]
 ```
 
+Note that the trigger rule checks the scalr signature and checks that the request was signed less than 5 minutes before it was received. Please make sure that NTP is enabled on both your Scalr server and your webhook handler to prevent any issues.
+
 Original documentation:
 
 # What is webhook?

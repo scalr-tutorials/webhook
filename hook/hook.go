@@ -11,7 +11,6 @@ import (
 	"io/ioutil"
 	"math"
 	"net"
-	"net/http"
 	"net/textproto"
 	"reflect"
 	"regexp"
@@ -148,8 +147,9 @@ func CheckScalrSignature(headers map[string]interface{}, body []byte, signingKey
 	if !checkDate {
 		return true, nil
 	}
-
-	date, err := http.ParseTime(dateHeader)
+    // Example format: Fri 08 Sep 2017 11:24:32 UTC
+    date, err := time.Parse("Mon 02 Jan 2006 15:04:05 MST", dateHeader)
+    //date, err := time.Parse(time.RFC1123, dateHeader)
 	if err != nil {
 		return false, err
 	}
