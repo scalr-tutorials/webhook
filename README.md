@@ -7,12 +7,21 @@ This is a fork of [adnanh/webhook](https://github.com/adnanh/webhook/) that adds
     {
         "id": "scalr-test",
         "execute-command": "test.sh",
+        "command-working-directory": "/opt/webhooks",
+        "include-command-output-in-response": true,
         "trigger-rule": {
             "match": {
                 "type": "scalr-signature",
                 "secret": "Scalr-provided signing key"
             }
-        }
+        },
+        "pass-environment-to-command": [
+            {
+                "envname": "SERVER_HOSTNAME",
+                "source": "payload",
+                "name": "data.SCALR_SERVER_HOSTNAME"
+            }
+        ]
     }
 ]
 ```
