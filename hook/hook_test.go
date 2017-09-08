@@ -93,9 +93,10 @@ var checkScalrSignatureTests = []struct {
 	},
 }
 
+// TODO: also test date header check
 func TestCheckScalrSignature(t *testing.T) {
 	for _, testCase := range checkScalrSignatureTests {
-		valid, err := CheckScalrSignature(testCase.headers, testCase.payload, testCase.secret)
+		valid, err := CheckScalrSignature(testCase.headers, testCase.payload, testCase.secret, false)
 		if valid != testCase.ok {
 			t.Errorf("failed to check scalr signature fot test case: %s\nexpected ok:%#v, got ok:%#v}",
 				testCase.description, testCase.ok, valid)

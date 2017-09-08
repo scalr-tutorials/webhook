@@ -9,12 +9,15 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"math"
 	"net"
+	"net/http"
 	"net/textproto"
 	"reflect"
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/ghodss/yaml"
 )
@@ -123,7 +126,7 @@ func CheckPayloadSignature256(payload []byte, secret string, signature string) (
 	return expectedMAC, err
 }
 
-func CheckScalrSignature(headers map[string]interface{}, body []byte, signingKey string) (bool, error) {
+func CheckScalrSignature(headers map[string]interface{}, body []byte, signingKey string, checkDate bool) (bool, error) {
 	// Check for the signature and date headers
 	if _, ok := headers["X-Signature"]; !ok {
 		return false, nil
@@ -140,6 +143,21 @@ func CheckScalrSignature(headers map[string]interface{}, body []byte, signingKey
 
 	if !hmac.Equal([]byte(providedSignature), []byte(expectedSignature)) {
 		return false, &SignatureError{providedSignature}
+	}
+
+	if !checkDate {
+		return true, nil
+	}
+
+	date, err := http.ParseTime(dateHeader)
+	if err != nil {
+		return false, err
+	}
+	now := time.Now()
+	delta := math.Abs(now.Sub(date).Seconds())
+
+	if delta > 300 {
+		return false, &SignatureError{"outdated"}
 	}
 	return true, nil
 }
@@ -660,7 +678,7 @@ func (r MatchRule) Evaluate(headers, query, payload *map[string]interface{}, bod
 	}
 
 	if r.Type == ScalrSignature {
-		return CheckScalrSignature(*headers, *body, r.Secret)
+		return CheckScalrSignature(*headers, *body, r.Secret, true)
 	}
 
 	if arg, ok := r.Parameter.Get(headers, query, payload); ok {
